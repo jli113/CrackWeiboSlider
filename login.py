@@ -12,7 +12,7 @@ PIXELS = []
 
 
 def getExactly(im):
-    """ 精确剪切"""
+    """ Precise cutting """
     imin = -1
     imax = -1
     jmin = -1
@@ -38,7 +38,7 @@ def getExactly(im):
 
 
 def getType(browser):
-    """ 识别图形路径 """
+    """ Identifying the graphic path """
     ttype = ''
     time.sleep(3.5)
     im0 = Image.open(io.BytesIO(browser.get_screenshot_as_png()))
@@ -52,7 +52,7 @@ def getType(browser):
         isGoingOn = True
         for i in range(width):
             for j in range(height):
-                if ((im.load()[i, j] >= 245 and ims[png][i][j] < 245) or (im.load()[i, j] < 245 and ims[png][i][j] >= 245)) and abs(ims[png][i][j] - im.load()[i, j]) > 10: # 以245为临界值，大约245为空白，小于245为线条；两个像素之间的差大约10，是为了去除245边界上的误差
+                if ((im.load()[i, j] >= 245 and ims[png][i][j] < 245) or (im.load()[i, j] < 245 and ims[png][i][j] >= 245)) and abs(ims[png][i][j] - im.load()[i, j]) > 10: # With 245 as the threshold, about 245 as the blank, less than 245 as the line; the difference between two pixels is about 10 to remove the error on the 245 boundary
                     isGoingOn = False
                     break
             if isGoingOn is False:
@@ -72,22 +72,22 @@ def getType(browser):
 
 
 def move(browser, coordinate, coordinate0):
-    """ 从坐标coordinate0，移动到坐标coordinate """
+    """ Move from coordinate0 to coordinate """
     time.sleep(0.05)
-    length = sqrt((coordinate[0] - coordinate0[0]) ** 2 + (coordinate[1] - coordinate0[1]) ** 2)  # 两点直线距离
-    if length < 4:  # 如果两点之间距离小于4px，直接划过去
+    length = sqrt((coordinate[0] - coordinate0[0]) ** 2 + (coordinate[1] - coordinate0[1]) ** 2)  # Two point line distance
+    if length < 4:  # If the distance between two points is less than 4PX, go straight ahead.
         ActionChains(browser).move_by_offset(coordinate[0] - coordinate0[0], coordinate[1] - coordinate0[1]).perform()
         return
-    else:  # 递归，不断向着终点滑动
+    else:  # Recursion, sliding to the end
         step = random.randint(3, 5)
-        x = int(step * (coordinate[0] - coordinate0[0]) / length)  # 按比例
+        x = int(step * (coordinate[0] - coordinate0[0]) / length)  # In proportion
         y = int(step * (coordinate[1] - coordinate0[1]) / length)
         ActionChains(browser).move_by_offset(x, y).perform()
         move(browser, coordinate, (coordinate0[0] + x, coordinate0[1] + y))
 
 
 def draw(browser, ttype):
-    """ 滑动 """
+    """ Slide """
     if len(ttype) == 4:
         px0 = PIXELS[int(ttype[0]) - 1]
         login = browser.find_element_by_id('loginAction')
@@ -116,12 +116,12 @@ if __name__ == '__main__':
     name = browser.find_element_by_id('loginName')
     psw = browser.find_element_by_id('loginPassword')
     login = browser.find_element_by_id('loginAction')
-    name.send_keys('15200692422')  # 测试账号
+    name.send_keys('15200692422')  # Testing account
     psw.send_keys('zckhm7071')
     login.click()
 
-    ttype = getType(browser)  # 识别图形路径
+    ttype = getType(browser)  # Identifying the graphic path
     print 'Result: %s!' % ttype
-    draw(browser, ttype)  # 滑动破解
+    draw(browser, ttype)  # Slide
     time.sleep(20)
     browser.close()
